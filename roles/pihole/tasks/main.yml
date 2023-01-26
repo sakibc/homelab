@@ -1,0 +1,6 @@
+---
+- name: Download Docker install script
+  ansible.builtin.get_url:
+    url: https://get.docker.com
+    dest: '{{ ansible_env.HOME }}/get-docker.sh'
+    mode: '0100'

@@ -1,0 +1,11 @@
+all:
+  children:
+    main_server:
+      hosts:
+        sakibs-ubuntu-server.local:
+          ansible_user: sakib
+    pihole:
+      hosts:
+        pihole.local:
+          ansible_user: sakib
+    

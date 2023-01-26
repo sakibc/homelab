@@ -1,0 +1,11 @@
+---
+- name: Set up home lab main server
+  hosts: main_server
+  roles:
+    - main_server
+    - control_node
+
+- name: Set up Pihole
+  hosts: pihole
+  roles:
+    - pihole
