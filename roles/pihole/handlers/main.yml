@@ -1,0 +1,10 @@
+---
+- name: Reboot
+  become: true
+  ansible.builtin.reboot:
+
+- name: Recompose
+  become: true
+  ansible.builtin.shell: docker compose down && docker compose up -d
+  args:
+    chdir: '{{ ansible_env.HOME }}'
