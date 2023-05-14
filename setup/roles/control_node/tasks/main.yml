@@ -1,3 +1,59 @@
 ---
-- name: Ping potential control node
-  ansible.builtin.ping:
+- name: Clone homelab repo # noqa: latest
+  ansible.builtin.git:
+    repo: https://github.com/sakibc/homelab.git
+    dest: "{{ ansible_env.HOME }}/homelab"
+    version: main
+
+- name: Copy over homelab.yml
+  ansible.builtin.copy:
+    src: ../../homelab.yml
+    dest: "{{ ansible_env.HOME }}/homelab/setup/homelab.yml"
+    mode: "u=rw,g=r,o=r"
+
+- name: Ensure authelia config directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/homelab/authelia/config"
+    state: directory
+
+- name: Copy over authelia config
+  ansible.builtin.copy:
+    src: ../../../authelia/config/configuration.yml
+    dest: "{{ ansible_env.HOME }}/homelab/authelia/config/configuration.yml"
+    mode: "u=rw,g=r,o=r"
+
+- name: Copy over authelia db
+  ansible.builtin.copy:
+    src: ../../../authelia/config/db.sqlite3
+    dest: "{{ ansible_env.HOME }}/homelab/authelia/config/db.sqlite3"
+    mode: "u=rw,g=r,o=r"
+
+- name: Copy over authelia secrets folder
+  ansible.builtin.copy:
+    src: ../../../authelia/secrets
+    dest: "{{ ansible_env.HOME }}/homelab/authelia"
+    mode: "u=r,g=r,o=r"
+
+- name: Copy over .env file
+  ansible.builtin.copy:
+    src: ../../../.env
+    dest: "{{ ansible_env.HOME }}/homelab/.env"
+    mode: "u=r,g=r,o=r"
+
+- name: Copy over flame folder
+  ansible.builtin.copy:
+    src: ../../../flame
+    dest: "{{ ansible_env.HOME }}/homelab"
+    mode: "u=rw,g=r,o=r"
+
+- name: Copy over lldap folder
+  ansible.builtin.copy:
+    src: ../../../lldap
+    dest: "{{ ansible_env.HOME }}/homelab"
+    mode: "u=rw,g=r,o=r"
+
+- name: Copy over etc-wireguard folder
+  ansible.builtin.copy:
+    src: ../../../etc-wireguard
+    dest: "{{ ansible_env.HOME }}/homelab"
+    mode: "u=rw,g=r,o=r"

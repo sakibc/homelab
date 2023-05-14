@@ -1,14 +1,15 @@
 ---
 - name: Download Docker install script
+  become: true
   ansible.builtin.get_url:
     url: https://get.docker.com
-    dest: '{{ ansible_env.HOME }}/get-docker.sh'
-    mode: '0500'
+    dest: "{{ ansible_env.HOME }}/get-docker.sh"
+    mode: "0500"
 
 - name: Run Docker install script
   ansible.builtin.command: ./get-docker.sh
   args:
-    chdir: '{{ ansible_env.HOME }}'
+    chdir: "{{ ansible_env.HOME }}"
     creates: /var/run/docker.sock
 
 - name: Set static IP address
@@ -18,22 +19,22 @@
     dest: /etc/dhcpcd.conf
     owner: root
     group: netdev
-    mode: 'u=rw,g=rw,o=r'
+    mode: "u=rw,g=rw,o=r"
   notify: Reboot
 
 - name: Copy over docker-compose file
   ansible.builtin.copy:
     src: docker-compose.yml
-    dest: '{{ ansible_env.HOME }}/docker-compose.yml'
-    mode: 'u=r,g=r,o=r'
+    dest: "{{ ansible_env.HOME }}/docker-compose.yml"
+    mode: "u=r,g=r,o=r"
   notify: Recompose
 
 - name: Copy over secret file
   become: true
   ansible.builtin.copy:
     src: pihole_password_file
-    dest: '{{ ansible_env.HOME }}/pihole_password_file'
-    mode: '0700'
+    dest: "{{ ansible_env.HOME }}/pihole_password_file"
+    mode: "0700"
     owner: root
     group: root
   notify: Recompose

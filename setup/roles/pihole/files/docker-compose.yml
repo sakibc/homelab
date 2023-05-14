@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    network_mode: 'host'
+    environment:
+      FTLCONF_LOCAL_IPV4: 10.88.111.210
+      VIRTUAL_HOST: pihole.sakibchowdhury.ca
+      WEBPASSWORD_FILE: '/pihole_password_file'
+      TZ: 'America/Toronto'
+      DNSSEC: true
+      QUERY_LOGGING: false
+      DHCP_ACTIVE: true
+      DHCP_START: 10.88.111.1
+      DHCP_END: 10.88.111.200
+      DHCP_ROUTER: 10.88.111.254
+      DNS_BOGUS_PRIV: true
+      DNS_FQDN_REQUIRED: true
+      DHCP_IPv6: false
+      DHCP_rapid_commit: false
+      FTLCONF_PRIVACYLEVEL: 1
+      FTLCONF_BLOCK_ICLOUD_PR: true
+    volumes:
+      - './etc-pihole/:/etc/pihole/'
+      - './etc-dnsmasq.d/:/etc/dnsmasq.d/'
+      - './pihole_password_file:/pihole_password_file'
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped

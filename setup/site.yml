@@ -5,10 +5,16 @@
 - name: Set up home lab main server
   hosts: main_server
   roles:
-    - main_server
-    - control_node
+    - role: control_node
+      tags:
+        - control_node
+    - role: main_server
+      tags:
+        - main_server
 
 - name: Set up Pihole
   hosts: pihole
   roles:
+    - pihole
+  tags:
     - pihole

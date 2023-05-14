@@ -1,0 +1,79 @@
+# The Caddyfile is an easy way to configure your Caddy web server.
+#
+# Unless the file starts with a global options block, the first
+# uncommented line is always the address of your site.
+#
+# To use your own domain name (with automatic HTTPS), first make
+# sure your domain's A/AAAA DNS records are properly pointed to
+# this machine's public IP, then replace ":80" below with your
+# domain name.
+{
+	cert_issuer acme
+}
+
+(auth_guard) {
+	forward_auth authelia:9091 {
+		uri /api/verify?rd=https://auth.sakibchowdhury.ca/
+		copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+	}
+}
+
+auth.sakibchowdhury.ca {
+	reverse_proxy authelia:9091
+}
+
+ldap.auth.sakibchowdhury.ca {
+	import auth_guard
+
+	reverse_proxy lldap:17170
+}
+
+server.sakibchowdhury.ca {
+	import auth_guard
+
+	reverse_proxy flame:5005
+}
+
+pihole.sakibchowdhury.ca {
+	import auth_guard
+
+	redir / /admin
+	reverse_proxy pi.hole
+}
+
+homeassistant.sakibchowdhury.ca {
+	import auth_guard
+
+	reverse_proxy homeassistant.lan:8123
+}
+
+ai.sakibchowdhury.ca {
+	route {
+		reverse_proxy /ws ai.sakibs-ubuntu-vm.lan:80 {
+			header_up Host {upstream_hostport}
+		}
+
+		import auth_guard
+	}
+
+	reverse_proxy http://ai.sakibs-ubuntu-vm.lan {
+		header_up Host {upstream_hostport}
+	}
+}
+
+sd.sakibchowdhury.ca {
+ 	import auth_guard
+
+ 	reverse_proxy /* http://sd.sakibs-ubuntu-vm.lan {
+ 		header_up Host {upstream_hostport}
+ 	}
+}
+
+vpn.sakibchowdhury.ca {
+	import auth_guard
+
+	reverse_proxy wg-easy:51821
+}
+
+# Refer to the Caddy docs for more information:
+# https://caddyserver.com/docs/caddyfile

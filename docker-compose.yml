@@ -1,0 +1,90 @@
+version: "3.9"
+
+services:
+  caddy:
+    container_name: caddy
+    image: caddy:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    dns:
+      - "10.88.111.210"
+    volumes:
+      - "./Caddyfile:/etc/caddy/Caddyfile"
+      - "./caddy/caddy-data:/data"
+      - "./caddy/caddy-config:/config"
+    restart: unless-stopped
+
+  lldap:
+    container_name: lldap
+    image: lldap/lldap:stable
+    ports:
+      - "3890:3890"
+    expose:
+      - "17170"
+    volumes:
+      - "./lldap/data:/data"
+      - "./lldap/secrets:/secrets"
+    environment:
+      TZ: America/Toronto
+      LLDAP_JWT_SECRET_FILE: /secrets/LLDAP_JWT_SECRET
+      LLDAP_LDAP_USER_PASS_FILE: /secrets/LLDAP_LDAP_USER_PASS
+      LLDAP_LDAP_BASE_DN: "dc=sakibchowdhury,dc=ca"
+    restart: unless-stopped
+
+  flame:
+    container_name: flame
+    image: pawelmalak/flame
+    expose:
+      - "5005"
+    volumes:
+      - "./flame:/app/data"
+    environment:
+      PASSWORD: $FLAME_PASSWORD
+    restart: unless-stopped
+
+  authelia:
+    container_name: authelia
+    image: authelia/authelia:latest
+    expose:
+      - "9091"
+    extra_hosts:
+      - "server.sakibchowdhury.ca:host-gateway"
+    environment:
+      AUTHELIA_JWT_SECRET_FILE: /secrets/JWT_SECRET
+      AUTHELIA_SESSION_SECRET_FILE: /secrets/SESSION_SECRET
+      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /secrets/STORAGE_ENCRYPTION_KEY
+      AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE: /secrets/AUTHENTICATION_BACKEND_LDAP_PASSWORD
+    volumes:
+      - "./authelia/config:/config"
+      - "./authelia/secrets:/secrets"
+    restart: unless-stopped
+
+  authelia-redis:
+    image: redis:alpine
+    container_name: authelia-redis
+    volumes:
+      - ./authelia/redis:/data
+    expose:
+      - "6379"
+    restart: unless-stopped
+    environment:
+      - TZ=America/Toronto
+
+  wg-easy:
+    container_name: wg-easy
+    image: weejewel/wg-easy
+    ports:
+      - 51820:51820/udp
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv4.ip_forward=1
+    volumes:
+      - "./etc-wireguard:/etc/wireguard"
+    environment:
+      WG_HOST: "vpn.sakibchowdhury.ca"
+      WG_DEFAULT_DNS: "10.88.111.210"
+    restart: unless-stopped
