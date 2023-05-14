@@ -1,0 +1,14 @@
+---
+- name: copy over dotfiles
+  copy:
+    src: "{{ item.src }}"
+    dest: "~/{{ item.dest }}"
+    backup: yes
+  loop:
+    - { src: tmux.conf, dest: .tmux.conf }
+    - { src: zshrc, dest: .zshrc }
+
+- name: install Antigen
+  get_url:
+    url: https://git.io/antigen
+    dest: "{{ ansible_env.HOME }}/antigen.zsh"
