@@ -4,8 +4,11 @@ all:
       hosts:
         sakibs-ubuntu-server.local:
           ansible_user: sakib
+    ubuntu_vm:
+      hosts:
+        sakibs-ubuntu-vm.local:
+          ansible_user: sakib
     pihole:
       hosts:
         pihole.local:
           ansible_user: sakib
-    

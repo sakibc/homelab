@@ -5,11 +5,7 @@ abort_setup () {
   exit 1
 }
 
-abort_on_failure () {
-  abort_setup
-}
-
-./keyscan.sh || abort_on_failure
+./keyscan.sh || abort_setup
 
 echo
 echo "Starting Ansible"
